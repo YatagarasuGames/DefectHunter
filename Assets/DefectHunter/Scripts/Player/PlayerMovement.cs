@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _rb.velocity = new Vector3(_joystick.Vertical * Speed, _rb.velocity.y, -_joystick.Horizontal * Speed);
+        _rb.linearVelocity = new Vector3(_joystick.Vertical * Speed, _rb.linearVelocity.y, -_joystick.Horizontal * Speed);
     }
 
 }
