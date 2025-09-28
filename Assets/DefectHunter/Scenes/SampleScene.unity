@@ -168,6 +168,7 @@ MonoBehaviour:
   _scriptableObjectInstallers: []
   _monoInstallers:
   - {fileID: 360428878}
+  - {fileID: 1497409310}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -1000,26 +1001,15 @@ GameObject:
   m_Component:
   - component: {fileID: 1482247506}
   - component: {fileID: 1482247505}
-  - component: {fileID: 1482247504}
+  - component: {fileID: 1482247508}
+  - component: {fileID: 1482247507}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: DefectInteractArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1482247504
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1482247503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 767ca7cd97f541c42a1d4f26e674fefc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DefectInteractArea
 --- !u!65 &1482247505
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1056,6 +1046,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1482247507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482247503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 767ca7cd97f541c42a1d4f26e674fefc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefectInteractArea
+--- !u!114 &1482247508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482247503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc02a85348d34164fac6f32d7bc4d99a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefectTask
+  _defectData: {fileID: 11400000, guid: b2e41c66ab8a79f4c8395e042a6005af, type: 2}
+  _defectInfoObject: {fileID: 3255623830221810255, guid: 288314854e4c47b47b7968bd74198832,
+    type: 3}
 --- !u!1 &1497409308
 GameObject:
   m_ObjectHideFlags: 0
@@ -1295,8 +1312,8 @@ GameObject:
   - component: {fileID: 1676045663}
   - component: {fileID: 1676045662}
   m_Layer: 0
-  m_Name: Capsule
-  m_TagString: Untagged
+  m_Name: Player
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
