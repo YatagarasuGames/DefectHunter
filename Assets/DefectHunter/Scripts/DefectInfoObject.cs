@@ -21,7 +21,7 @@ public class DefectInfoObject : MonoBehaviour
     public void CreateMinigame()
     {
         var temp = Instantiate(_minigameObject, transform.parent);
-        _diContainer.Inject(temp.GetComponent<TapMinigame>());
+        _diContainer.Inject(temp.GetComponent<Minigame>());
     }
     public void Back()
     {
