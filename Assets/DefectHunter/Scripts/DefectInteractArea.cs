@@ -6,6 +6,7 @@ public class DefectInteractArea : MonoBehaviour
 {
     private bool _isCompleted = false;
     [Inject] private PlayerInteract _playerInteract;
+    [Inject] private DiContainer _container;
     private DefectTask _defectTask;
 
     private void Awake()
