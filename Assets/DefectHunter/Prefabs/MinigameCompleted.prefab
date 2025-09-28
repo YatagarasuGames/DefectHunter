@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5849056, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.3743786, g: 0.6132076, b: 0.21693665, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -167,7 +167,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 44.7
+  m_fontSize: 24.8
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -220,9 +220,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2505521266292186318}
-  - component: {fileID: 6484866131703184261}
+  - component: {fileID: 8662708151888994341}
   m_Layer: 0
-  m_Name: TapMiniGame
+  m_Name: MinigameCompleted
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -249,7 +249,7 @@ RectTransform:
   m_AnchoredPosition: {x: -0.045288086, y: -0.007385254}
   m_SizeDelta: {x: 0.8000488, y: -0.3180008}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &6484866131703184261
+--- !u!114 &8662708151888994341
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -258,15 +258,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4179298457139035588}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bec9bb9c13cab3c4fa03262161bdfb91, type: 3}
+  m_Script: {fileID: 11500000, guid: 600ff5155077d8744895e64270ec7ceb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TapMinigame
-  _pointsValue: 100
-  _clickCount: {fileID: 5223918071341130416}
-  _button: {fileID: 8290151838702592214}
-  _defectSolvedGameObject: {fileID: 4179298457139035588, guid: 1db3e3f80ebaf2d4fb5fc227535baac2,
-    type: 3}
-  _clickGoal: 10
+  m_EditorClassIdentifier: Assembly-CSharp::MinigameCompleted
 --- !u!1 &7247211883696020311
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,7 +381,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5883204736211061191}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8662708151888994341}
+        m_TargetAssemblyTypeName: MinigameCompleted, Assembly-CSharp
+        m_MethodName: Back
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7784881786436208458
 GameObject:
   m_ObjectHideFlags: 0
@@ -534,7 +540,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3708292069867742254}
   m_Layer: 0
-  m_Name: MiniGame
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

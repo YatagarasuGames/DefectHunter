@@ -5,13 +5,21 @@ using Zenject;
 public class DefectInteractArea : MonoBehaviour
 {
     private bool _isCompleted = false;
-    [Inject] private PlayerInteract _playerInteract;
     private DefectTask _defectTask;
+    [Inject] private PlayerInteract _playerInteract;
 
-    private void Awake()
+    private void OnEnable()
     {
         _defectTask = GetComponent<DefectTask>();
+        MinigameCompleted.OnMinigameCompleted += HandleDefectCompleted;
     }
+
+    private void HandleDefectCompleted()
+    {
+        _isCompleted = true;
+        _playerInteract.gameObject.SetActive(false);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (_isCompleted) return;
@@ -29,5 +37,10 @@ public class DefectInteractArea : MonoBehaviour
         {
             _playerInteract.gameObject.SetActive(false);
         }
+    }
+
+    private void OnDisable()
+    {
+        MinigameCompleted.OnMinigameCompleted -= HandleDefectCompleted;
     }
 }
