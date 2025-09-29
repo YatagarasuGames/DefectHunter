@@ -5,6 +5,20 @@ using Firebase.Auth;
 using Firebase.Extensions;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System;
+using Firebase.Database;
+
+[Serializable]
+public class UserData
+{
+    public string Username;
+    public int Points;
+
+    public UserData(string username, int points)
+    {
+        Username = username; Points = points;
+    }
+}
 
 public class AuthSystem : MonoBehaviour
 {
@@ -13,10 +27,16 @@ public class AuthSystem : MonoBehaviour
     [SerializeField] private TMP_InputField _loginPasswordInput;
 
     [Header("Register")]
+    [SerializeField] private TMP_InputField _usernameInput;
     [SerializeField] private TMP_InputField _registerEmailInput;
     [SerializeField] private TMP_InputField _registerPasswordInput;
     [SerializeField] private TMP_InputField _registerConfirmPasswordInput;
 
+    private DatabaseReference _db;
+    private void Awake()
+    {
+        _db = FirebaseDatabase.DefaultInstance.RootReference;
+    }
 
     public void Register()
     {
@@ -43,6 +63,9 @@ public class AuthSystem : MonoBehaviour
             Debug.LogFormat("Created user: {0}, {1}",
                 result.User.DisplayName, result.User.UserId);
 
+            UserData userData = new UserData(_usernameInput.text, 0);
+            string userDataJson = JsonUtility.ToJson(userData);
+            _db.Child("users").Child(result.User.UserId).SetRawJsonValueAsync(userDataJson);
             
             if (result.User.IsEmailVerified)
             {

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "606588736923",
+    "firebase_url": "https://defect-hunter-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "defect-hunter",
     "storage_bucket": "defect-hunter.firebasestorage.app"
   },
