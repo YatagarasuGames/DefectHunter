@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id">
+  <string name="gcm_defaultSenderId" translatable="false">606588736923</string>
+  <string name="google_storage_bucket" translatable="false">defect-hunter.firebasestorage.app</string>
+  <string name="project_id" translatable="false">defect-hunter</string>
+  <string name="google_api_key" translatable="false">AIzaSyC6gC4TpZMhFJy60Ula5_-DXHFnbnXTrgk</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyC6gC4TpZMhFJy60Ula5_-DXHFnbnXTrgk</string>
+  <string name="google_app_id" translatable="false">1:606588736923:android:b2899b7571ede1071a3d3e</string>
+</resources>

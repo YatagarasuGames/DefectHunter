@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "606588736923",
+    "project_id": "defect-hunter",
+    "storage_bucket": "defect-hunter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606588736923:android:b2899b7571ede1071a3d3e",
+        "android_client_info": {
+          "package_name": "com.YatagarasuGames.DefectHunter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6gC4TpZMhFJy60Ula5_-DXHFnbnXTrgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,7 @@ using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class AuthSystem : MonoBehaviour
 {
@@ -28,18 +29,21 @@ public class AuthSystem : MonoBehaviour
         {
             if (task.IsCanceled)
             {
-                Debug.LogError("Canceled");
+                Debug.LogError("Register Canceled");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("Failed");
+                Debug.LogError("Register Failed");
+                print(task.Exception);
                 return;
             }
+            
             AuthResult result = task.Result;
             Debug.LogFormat("Created user: {0}, {1}",
                 result.User.DisplayName, result.User.UserId);
 
+            
             if (result.User.IsEmailVerified)
             {
                 Debug.Log("Register success");
@@ -75,5 +79,48 @@ public class AuthSystem : MonoBehaviour
                 print("Email successfully sent");
             }
         }
+    }
+
+
+
+    public void Login()
+    {
+        FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+        string email = _loginEmailInput.text;
+        string password = _loginPasswordInput.text;
+
+        Credential credential = EmailAuthProvider.GetCredential(email, password);
+
+        auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("Login cancelled");
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("Login failed");
+                print(task.Exception.ToString());
+            }
+            
+            AuthResult result = task.Result;
+
+            print(task.Result.User.IsEmailVerified);
+            print(result.User.DisplayName);
+            print(result.User.UserId);
+
+            if (result.User.IsEmailVerified)
+            {
+                Debug.Log("Login success");
+                SceneManager.LoadScene("Game");
+            }
+            else
+            {
+                Debug.LogWarning("Please verify email");
+            }
+
+
+        });
+        print("end");
     }
 }
