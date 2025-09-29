@@ -18,6 +18,11 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         _rb.linearVelocity = new Vector3(_joystick.Vertical * Speed, _rb.linearVelocity.y, -_joystick.Horizontal * Speed);
+
+        if (_joystick.Horizontal != 0 && _joystick.Vertical != 0)
+        {
+            transform.rotation = Quaternion.LookRotation(_rb.linearVelocity);
+        }
     }
 
 }
