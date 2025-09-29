@@ -70,6 +70,7 @@ public class AuthSystem : MonoBehaviour
             if (result.User.IsEmailVerified)
             {
                 Debug.Log("Register success");
+                SceneManager.LoadScene("Menu");
             }
             else
             {
@@ -135,7 +136,7 @@ public class AuthSystem : MonoBehaviour
             if (result.User.IsEmailVerified)
             {
                 Debug.Log("Login success");
-                SceneManager.LoadScene("Game");
+                SceneManager.LoadScene("Menu");
             }
             else
             {
