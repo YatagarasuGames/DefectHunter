@@ -4,7 +4,16 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/DefectHunter/Scenes/Auth.unity
+    guid: 76336027c3c82344297563c0a83029e5
+  - enabled: 1
+    path: Assets/DefectHunter/Scenes/Menu.unity
+    guid: 09f0db634ef08e043ba4c10ef444bc45
+  - enabled: 1
+    path: Assets/DefectHunter/Scenes/Game.unity
+    guid: c850ee8c3b14cc8459e7e186857cf567
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000,
       guid: f39374bd6c4391a4da06fa4acd58bcea, type: 2}
@@ -14,3 +23,4 @@ EditorBuildSettings:
       guid: 250ad7af407e45a4881b439a5b259bdb, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000,
       guid: ba746fdf7ee4cc343aa2f80d40aac3df, type: 2}
+  m_UseUCBPForAssetBundles: 0
