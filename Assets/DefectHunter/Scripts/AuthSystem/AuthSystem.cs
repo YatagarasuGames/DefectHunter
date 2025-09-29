@@ -65,7 +65,7 @@ public class AuthSystem : MonoBehaviour
 
             UserData userData = new UserData(_usernameInput.text, 0);
             string userDataJson = JsonUtility.ToJson(userData);
-            _db.Child("users").Child(result.User.UserId).SetRawJsonValueAsync(userDataJson);
+            _db.Child("users").Child(result.User.UserId).SetRawJsonValueAsync(userDataJson);    
             
             if (result.User.IsEmailVerified)
             {
