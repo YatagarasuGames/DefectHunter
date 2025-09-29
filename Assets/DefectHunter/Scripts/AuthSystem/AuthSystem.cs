@@ -7,6 +7,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 using Firebase.Database;
+using UnityEngine.UI;
 
 [Serializable]
 public class UserData
@@ -25,6 +26,7 @@ public class AuthSystem : MonoBehaviour
     [Header("Login")]
     [SerializeField] private TMP_InputField _loginEmailInput;
     [SerializeField] private TMP_InputField _loginPasswordInput;
+    [SerializeField] private Toggle _rememberMeToggle;
 
     [Header("Register")]
     [SerializeField] private TMP_InputField _usernameInput;
@@ -32,10 +34,112 @@ public class AuthSystem : MonoBehaviour
     [SerializeField] private TMP_InputField _registerPasswordInput;
     [SerializeField] private TMP_InputField _registerConfirmPasswordInput;
 
+    private const string REMEMBER_ME_KEY = "RememberMe";
+    private const string LAST_LOGIN_DATE_KEY = "LastLoginDate";
+    private const int DAYS_TO_EXPIRE = 3;
+
     private DatabaseReference _db;
+
     private void Awake()
     {
         _db = FirebaseDatabase.DefaultInstance.RootReference;
+        CheckAutoLogin();
+    }
+
+    private void Start()
+    {
+        _rememberMeToggle.isOn = PlayerPrefs.GetInt(REMEMBER_ME_KEY, 0) == 1;
+    }
+
+    private void CheckAutoLogin()
+    {
+        if (ShouldAutoLogin())
+        {
+            Debug.Log("Attempting auto-login...");
+            AutoLogin();
+        }
+        else
+        {
+            Debug.Log("Auto-login not available, showing login screen");
+        }
+    }
+
+    private bool ShouldAutoLogin()
+    {
+        if (PlayerPrefs.GetInt(REMEMBER_ME_KEY, 0) == 0)
+            return false;
+
+        string lastLoginString = PlayerPrefs.GetString(LAST_LOGIN_DATE_KEY, "");
+        if (string.IsNullOrEmpty(lastLoginString))
+            return false;
+
+        try
+        {
+            DateTime lastLoginDate = DateTime.Parse(lastLoginString);
+            TimeSpan timeSinceLastLogin = DateTime.Now - lastLoginDate;
+
+            if (timeSinceLastLogin.TotalDays <= DAYS_TO_EXPIRE)
+            {
+                Debug.Log($"Auto-login available");
+                return true;
+            }
+            else
+            {
+                Debug.Log($"Auto-login expired");
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error parsing login date: {e}");
+            return false;
+        }
+    }
+
+    private void AutoLogin()
+    {
+        FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+
+        FirebaseUser currentUser = auth.CurrentUser;
+
+        if (currentUser != null)
+        {
+            Debug.Log("User already authenticated, proceeding to menu");
+            OnAutoLoginSuccess(currentUser);
+        }
+        else
+        {
+            StartCoroutine(WaitForAuth());
+        }
+    }
+
+    private IEnumerator WaitForAuth()
+    {
+        Debug.Log("Waiting for Firebase Auth initialization...");
+
+        var auth = FirebaseAuth.DefaultInstance;
+        yield return new WaitForSeconds(1f);
+
+        var user = auth.CurrentUser;
+
+        if (user != null)
+        {
+            Debug.Log($"Auto-login successful for user: {user.Email}");
+            OnAutoLoginSuccess(user);
+        }
+        else
+        {
+            Debug.Log("No saved session found for auto-login");
+            ClearRememberMe();
+        }
+    }
+
+    private void OnAutoLoginSuccess(FirebaseUser user)
+    {
+        PlayerPrefs.SetString(LAST_LOGIN_DATE_KEY, DateTime.Now.ToString());
+        PlayerPrefs.Save();
+
+        LoadMainMenu();
     }
 
     public void Register()
@@ -58,28 +162,97 @@ public class AuthSystem : MonoBehaviour
                 print(task.Exception);
                 return;
             }
-            
+
             AuthResult result = task.Result;
             Debug.LogFormat("Created user: {0}, {1}",
                 result.User.DisplayName, result.User.UserId);
 
             UserData userData = new UserData(_usernameInput.text, 0);
             string userDataJson = JsonUtility.ToJson(userData);
-            _db.Child("users").Child(result.User.UserId).SetRawJsonValueAsync(userDataJson);    
-            
+            _db.Child("users").Child(result.User.UserId).SetRawJsonValueAsync(userDataJson);
+
             if (result.User.IsEmailVerified)
             {
                 Debug.Log("Register success");
+                SaveRememberMeState(true);
                 SceneManager.LoadScene("Menu");
             }
             else
             {
                 Debug.Log("Email verification required");
                 SendEmailVerification();
+                SaveRememberMeState(true);
             }
 
         });
     }
+
+    public void Login()
+    {
+        FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+        string email = _loginEmailInput.text;
+        string password = _loginPasswordInput.text;
+
+        Credential credential = EmailAuthProvider.GetCredential(email, password);
+
+        auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("Login cancelled");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("Login failed");
+                print(task.Exception.ToString());
+                return;
+            }
+
+            AuthResult result = task.Result;
+
+            print(task.Result.User.IsEmailVerified);
+            print(result.User.DisplayName);
+            print(result.User.UserId);
+
+            if (result.User.IsEmailVerified)
+            {
+                Debug.Log("Login success");
+                SaveRememberMeState(_rememberMeToggle.isOn);
+                SceneManager.LoadScene("Menu");
+            }
+            else
+            {
+                Debug.LogWarning("Please verify email");
+                SaveRememberMeState(_rememberMeToggle.isOn);
+            }
+        });
+    }
+
+    private void SaveRememberMeState(bool rememberMe)
+    {
+        if (rememberMe)
+        {
+            PlayerPrefs.SetInt(REMEMBER_ME_KEY, 1);
+            PlayerPrefs.SetString(LAST_LOGIN_DATE_KEY, DateTime.Now.ToString());
+        }
+        else
+        {
+            PlayerPrefs.SetInt(REMEMBER_ME_KEY, 0);
+            PlayerPrefs.DeleteKey(LAST_LOGIN_DATE_KEY);
+        }
+        PlayerPrefs.Save();
+        Debug.Log($"Remember me set to: {rememberMe}");
+    }
+
+    private void ClearRememberMe()
+    {
+        PlayerPrefs.SetInt(REMEMBER_ME_KEY, 0);
+        PlayerPrefs.DeleteKey(LAST_LOGIN_DATE_KEY);
+        PlayerPrefs.Save();
+        Debug.Log("Remember me cleared");
+    }
+
     public void SendEmailVerification()
     {
         StartCoroutine(SendEmailVerificationAsync());
@@ -105,46 +278,8 @@ public class AuthSystem : MonoBehaviour
         }
     }
 
-
-
-    public void Login()
+    private void LoadMainMenu()
     {
-        FirebaseAuth auth = FirebaseAuth.DefaultInstance;
-        string email = _loginEmailInput.text;
-        string password = _loginPasswordInput.text;
-
-        Credential credential = EmailAuthProvider.GetCredential(email, password);
-
-        auth.SignInAndRetrieveDataWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("Login cancelled");
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("Login failed");
-                print(task.Exception.ToString());
-            }
-            
-            AuthResult result = task.Result;
-
-            print(task.Result.User.IsEmailVerified);
-            print(result.User.DisplayName);
-            print(result.User.UserId);
-
-            if (result.User.IsEmailVerified)
-            {
-                Debug.Log("Login success");
-                SceneManager.LoadScene("Menu");
-            }
-            else
-            {
-                Debug.LogWarning("Please verify email");
-            }
-
-
-        });
-        print("end");
+        SceneManager.LoadScene("Menu");
     }
 }
