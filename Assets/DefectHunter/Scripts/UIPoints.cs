@@ -30,6 +30,7 @@ public class UIPoints : MonoBehaviour
     {
         var temp = Instantiate(_pointsAddedEffect, transform);
         temp.text = pointsAdded.ToString();
+        temp.font = GetComponent<TMP_Text>().font;
         temp.transform.localPosition = new Vector3(0, visualEffectsOffset, 0);
         _textEffectsTween = temp.transform.DOLocalMoveY(0, visualEffectsDuration);
         temp.DOColor(new Color(255, 255, 255, 0), visualEffectsDuration).OnComplete(
