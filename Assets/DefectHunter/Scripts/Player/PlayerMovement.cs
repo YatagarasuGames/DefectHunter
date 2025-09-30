@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _rb;
     [field: SerializeField] public float Speed { get; private set; }
     [SerializeField] private FixedJoystick _joystick;
+    [SerializeField] private Animator _animator;
 
 
     private void Awake()
@@ -23,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.rotation = Quaternion.LookRotation(_rb.linearVelocity);
         }
+        _animator.SetBool("IsRunning", _joystick.Horizontal != 0 && _joystick.Vertical != 0);
     }
 
 }

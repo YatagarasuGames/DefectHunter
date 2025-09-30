@@ -3443,6 +3443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   <Speed>k__BackingField: 2
   _joystick: {fileID: 1175228193}
+  _animator: {fileID: 3253613082864296051}
 --- !u!54 &3253613082864296050
 Rigidbody:
   m_ObjectHideFlags: 0
