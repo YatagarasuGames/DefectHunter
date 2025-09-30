@@ -1226,7 +1226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc02a85348d34164fac6f32d7bc4d99a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DefectTask
-  _defectData: {fileID: 11400000, guid: b2e41c66ab8a79f4c8395e042a6005af, type: 2}
+  _defectData: {fileID: 11400000, guid: 3eca13044b801b546aa09e40b1b877d8, type: 2}
   _defectInfoObject: {fileID: 3255623830221810255, guid: 288314854e4c47b47b7968bd74198832,
     type: 3}
 --- !u!1 &1497409308

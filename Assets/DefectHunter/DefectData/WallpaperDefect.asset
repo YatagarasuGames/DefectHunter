@@ -15,4 +15,5 @@ MonoBehaviour:
   <Name>k__BackingField: Poorly hung wallpaper
   <Description>k__BackingField: Someone has hung the wallpaper incorrectly! Fix it
     quickly by hanging new wallpaper!
-  <Minigame>k__BackingField: {fileID: 0}
+  <Minigame>k__BackingField: {fileID: 4179298457139035588, guid: ab5a76f4eb3e33d4fa4aefbc6c051e52,
+    type: 3}

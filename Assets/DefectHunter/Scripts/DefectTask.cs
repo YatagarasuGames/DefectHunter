@@ -12,4 +12,9 @@ public class DefectTask : MonoBehaviour, IInteract
         var temp = Instantiate(_defectInfoObject, _playerCanvas.transform);
         temp.GetComponent<DefectInfoObject>().Init(_defectData, _container);
     }
+
+    public void Init(DefectData defectData)
+    {
+        _defectData = defectData;
+    }
 }
