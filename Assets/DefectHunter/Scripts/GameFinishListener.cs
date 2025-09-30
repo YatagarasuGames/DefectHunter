@@ -8,6 +8,7 @@ public class GameFinishListener : MonoBehaviour
 
     [SerializeField] private GameObject _finishGameMenu;
     [Inject] private Canvas _canvas;
+    [Inject] private DiContainer _di;
     private void OnEnable()
     {
         DefectsCreator.OnDefectsCreated += Init;
@@ -25,7 +26,9 @@ public class GameFinishListener : MonoBehaviour
         _completedDefects++;
         if(_completedDefects == _totalDefectsOnMap)
         {
-            Instantiate(_finishGameMenu, _canvas.transform);
+            
+            var menu = Instantiate(_finishGameMenu, _canvas.transform);
+            _di.Inject(menu.GetComponent<GameEndMenu>());
         }
         
     }

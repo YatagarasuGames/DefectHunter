@@ -491,7 +491,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 358d75a98eca7624399e9e482f6b2908, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFinishListener
-  _finishGameMenu: {fileID: 0}
+  _finishGameMenu: {fileID: 2324126163022718469, guid: e1392a334237b00488ab74a937b17f59,
+    type: 3}
 --- !u!4 &738628313
 Transform:
   m_ObjectHideFlags: 0
@@ -1730,7 +1731,6 @@ MonoBehaviour:
   _defectsData:
   - {fileID: 11400000, guid: b2e41c66ab8a79f4c8395e042a6005af, type: 2}
   - {fileID: 11400000, guid: 3eca13044b801b546aa09e40b1b877d8, type: 2}
-  - {fileID: 11400000, guid: 10670017dc8244242beddbc2fcb08370, type: 2}
   _defectsSpawnPoints:
   - {fileID: 429957632}
   - {fileID: 1359721897}
@@ -1743,7 +1743,7 @@ MonoBehaviour:
   - {fileID: 2029470347}
   - {fileID: 1637946709}
   - {fileID: 1374692570}
-  _defectCount: 5
+  _defectCount: 1
   _defectArea: {fileID: 3259088243897072136, guid: 0ecd79d63bc62fc43a73414fc4439db3,
     type: 3}
 --- !u!4 &2010657406
