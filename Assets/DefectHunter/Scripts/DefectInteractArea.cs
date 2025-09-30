@@ -7,6 +7,7 @@ public class DefectInteractArea : MonoBehaviour
     private bool _isCompleted = false;
     private DefectTask _defectTask;
     [Inject] private PlayerInteract _playerInteract;
+    [SerializeField] private GameObject _exclamationMark;
 
     private void OnEnable()
     {
@@ -18,6 +19,7 @@ public class DefectInteractArea : MonoBehaviour
     {
         _isCompleted = true;
         _playerInteract.gameObject.SetActive(false);
+        _exclamationMark.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
