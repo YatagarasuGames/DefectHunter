@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e652523f1d119a42949402c4ba1c870, type: 3}
-  m_Name: DefectData
+  m_Name: WallpaperDefect
   m_EditorClassIdentifier: Assembly-CSharp::DefectData
-  <Name>k__BackingField: Test
-  <Description>k__BackingField: Oh! This is something wrong here!
-  <Minigame>k__BackingField: {fileID: 4179298457139035588, guid: 111077333f4c28d4d9b904f594afd44a,
-    type: 3}
+  <Name>k__BackingField: Poorly hung wallpaper
+  <Description>k__BackingField: Someone has hung the wallpaper incorrectly! Fix it
+    quickly by hanging new wallpaper!
+  <Minigame>k__BackingField: {fileID: 0}
