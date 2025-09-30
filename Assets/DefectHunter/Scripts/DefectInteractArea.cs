@@ -8,6 +8,7 @@ public class DefectInteractArea : MonoBehaviour
     private DefectTask _defectTask;
     [Inject] private PlayerInteract _playerInteract;
     [SerializeField] private GameObject _exclamationMark;
+    private bool _isPlayerIn = false;
 
     private void OnEnable()
     {
@@ -17,6 +18,7 @@ public class DefectInteractArea : MonoBehaviour
 
     private void HandleDefectCompleted()
     {
+        if (_isPlayerIn == false) return;
         _isCompleted = true;
         _playerInteract.gameObject.SetActive(false);
         _exclamationMark.SetActive(false);
@@ -25,8 +27,10 @@ public class DefectInteractArea : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (_isCompleted) return;
+        
         if (other.gameObject.CompareTag("Player"))
         {
+            _isPlayerIn = true;
             _playerInteract.gameObject.SetActive(true);
             _playerInteract.SetInteractTarget(_defectTask);
         }
@@ -37,6 +41,7 @@ public class DefectInteractArea : MonoBehaviour
         if (_isCompleted) return;
         if (other.gameObject.CompareTag("Player"))
         {
+            _isPlayerIn = false;
             _playerInteract.gameObject.SetActive(false);
         }
     }
