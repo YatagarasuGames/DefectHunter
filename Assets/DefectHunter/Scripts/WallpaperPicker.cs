@@ -24,4 +24,9 @@ public class WallpaperPicker : MonoBehaviour
     {
         transform.DOScale(transform.localScale / _sizeModifier, 0.2f);
     }
+
+    private void OnDisable()
+    {
+        DOTween.Sequence().Kill();
+    }
 }

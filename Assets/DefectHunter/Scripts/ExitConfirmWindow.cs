@@ -11,11 +11,13 @@ public class ExitConfirmWindow : MonoBehaviour
 
     public void Exit()
     {
+        DOTween.Sequence().Kill();
         Application.Quit();
     }
 
     public void Back()
     {
+        DOTween.Sequence().Kill();
         Destroy(gameObject);
     }
 

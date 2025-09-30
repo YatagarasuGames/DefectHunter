@@ -39,6 +39,7 @@ public class ProfileViewWindow : MonoBehaviour
 
     public void Close()
     {
+        DOTween.Sequence().Kill();
         Destroy(gameObject);
     }
 }

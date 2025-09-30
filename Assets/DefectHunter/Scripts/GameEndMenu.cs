@@ -51,6 +51,7 @@ public class GameEndMenu : MonoBehaviour
 
     public void Exit()
     {
+        DOTween.Sequence().Kill();
         SceneManager.LoadScene("Menu");
     }
 

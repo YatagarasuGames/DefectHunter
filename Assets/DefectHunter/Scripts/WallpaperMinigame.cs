@@ -66,5 +66,10 @@ public class WallpaperMinigame : Minigame
 
     }
 
+    private void OnDisable()
+    {
+        DOTween.Sequence().Kill();
+    }
+
 
 }

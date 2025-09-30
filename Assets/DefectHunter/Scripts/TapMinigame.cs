@@ -40,6 +40,7 @@ public class TapMinigame : Minigame
 
     private void OnDisable()
     {
+        DOTween.Sequence().Kill();
         _button.onClick.RemoveAllListeners();
     }
 }
