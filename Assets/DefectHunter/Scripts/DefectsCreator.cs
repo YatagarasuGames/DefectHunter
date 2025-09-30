@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -10,6 +9,8 @@ public class DefectsCreator : MonoBehaviour
     [SerializeField] private int _defectCount;
     [SerializeField] private GameObject _defectArea;
     [Inject] private DiContainer _di;
+
+    public static System.Action<int> OnDefectsCreated;
     private void OnEnable()
     {
         CreateDefectAreas();
@@ -30,5 +31,6 @@ public class DefectsCreator : MonoBehaviour
             _di.Inject(defectArea.GetComponent<DefectTask>());
             _defectsSpawnPoints.Remove(tempPosition);
         }
+        OnDefectsCreated?.Invoke(_defectCount);
     }
 }
