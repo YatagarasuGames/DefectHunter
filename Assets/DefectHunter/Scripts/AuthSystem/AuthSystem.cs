@@ -26,6 +26,7 @@ public class AuthSystem : MonoBehaviour
     [Header("Login")]
     [SerializeField] private TMP_InputField _loginEmailInput;
     [SerializeField] private TMP_InputField _loginPasswordInput;
+    [SerializeField] private TMP_Text _loginErrorLog;
     [SerializeField] private Toggle _rememberMeToggle;
 
     [Header("Register")]
@@ -33,6 +34,7 @@ public class AuthSystem : MonoBehaviour
     [SerializeField] private TMP_InputField _registerEmailInput;
     [SerializeField] private TMP_InputField _registerPasswordInput;
     [SerializeField] private TMP_InputField _registerConfirmPasswordInput;
+    [SerializeField] private TMP_Text _registerErrorLog;
 
     private const string REMEMBER_ME_KEY = "RememberMe";
     private const string LAST_LOGIN_DATE_KEY = "LastLoginDate";
@@ -158,8 +160,18 @@ public class AuthSystem : MonoBehaviour
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("Register Failed");
-                print(task.Exception);
+                foreach (Exception exception in task.Exception.Flatten().InnerExceptions)
+                {
+                    if (exception is FirebaseException firebaseEx)
+                    {
+                        HandleFirebaseAuthError(firebaseEx, _registerErrorLog);
+                        _registerErrorLog.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Unexpected error: {exception.Message}");
+                    }
+                }
                 return;
             }
 
@@ -204,8 +216,18 @@ public class AuthSystem : MonoBehaviour
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("Login failed");
-                print(task.Exception.ToString());
+                foreach (Exception exception in task.Exception.Flatten().InnerExceptions)
+                {
+                    if (exception is FirebaseException firebaseEx)
+                    {
+                        HandleFirebaseAuthError(firebaseEx, _loginErrorLog);
+                        _loginErrorLog.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Unexpected error: {exception.Message}");
+                    }
+                }
                 return;
             }
 
@@ -282,4 +304,56 @@ public class AuthSystem : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
+
+
+
+    private void HandleFirebaseAuthError(FirebaseException firebaseEx, TMP_Text errorLog)
+    {
+        
+        AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+
+        switch (errorCode)
+        {
+            case AuthError.InvalidEmail:
+                errorLog.text = "Invalid email address";
+                break;
+            case AuthError.WrongPassword:
+                errorLog.text = "Wrong password";
+                break;
+            case AuthError.MissingPassword:
+                errorLog.text = "Password is missing";
+                break;
+            case AuthError.WeakPassword:
+                errorLog.text = "Password is too weak";
+                break;
+            case AuthError.UserNotFound:
+                errorLog.text = "User not found";
+                break;
+            case AuthError.EmailAlreadyInUse:
+                errorLog.text = "Email already in use";
+                break;
+            case AuthError.OperationNotAllowed:
+                errorLog.text = "Operation not allowed";
+                break;
+            case AuthError.TooManyRequests:
+                errorLog.text = "Too many requests. Try again later";
+                break;
+            case AuthError.AccountExistsWithDifferentCredentials:
+                errorLog.text = "Account exists with different credentials";
+                break;
+            case AuthError.RequiresRecentLogin:
+                errorLog.text = "Requires recent login";
+                break;
+            case AuthError.UserDisabled:
+                errorLog.text = "User account is disabled";
+                break;
+            case AuthError.NetworkRequestFailed:
+                errorLog.text = "Network request failed";
+                break;
+            default:
+                errorLog.text = $"Unknown error: {errorCode}";
+                break;
+        }
+    }
+
 }
