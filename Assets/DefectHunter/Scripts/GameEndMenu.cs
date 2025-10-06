@@ -24,7 +24,7 @@ public class GameEndMenu : MonoBehaviour
         _currentUser = FirebaseAuth.DefaultInstance.CurrentUser;
         StartCoroutine(UpdateDB());
 
-        _earnedPoints.text = $"Congratulations! You earned {_pointsSystem.Points} for this run!";
+        _earnedPoints.text = $"Congratulations! You earned {_pointsSystem.GetDecryptedPoints()} for this run!";
 
     }
 
@@ -39,7 +39,7 @@ public class GameEndMenu : MonoBehaviour
         if (jsonResult != null)
         {
             UserData userData = JsonUtility.FromJson<UserData>(jsonResult);
-            int newPoints = userData.Points + _pointsSystem.Points;
+            int newPoints = userData.Points + _pointsSystem.GetDecryptedPoints();
 
             UserData newUserData = new UserData(userData.Username, newPoints);
             string userDataJson = JsonUtility.ToJson(newUserData);

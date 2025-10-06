@@ -22,7 +22,7 @@ public class UIPoints : MonoBehaviour
 
     private void HandlePointsAdd(int pointsAdded)
     {
-        _pointsText.text = _pointsSystem.Points.ToString();
+        _pointsText.text = _pointsSystem.GetDecryptedPoints().ToString();
         CreateVisualEffects(pointsAdded);
     }
 
