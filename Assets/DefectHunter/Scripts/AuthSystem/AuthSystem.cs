@@ -9,20 +9,9 @@ using System;
 using Firebase.Database;
 using UnityEngine.UI;
 
-[Serializable]
-public class UserData
-{
-    public string Username;
-    public int Points;
-
-    public UserData(string username, int points)
-    {
-        Username = username; Points = points;
-    }
-}
-
 public class AuthSystem : MonoBehaviour
 {
+    #region Variables
     [Header("Login")]
     [SerializeField] private TMP_InputField _loginEmailInput;
     [SerializeField] private TMP_InputField _loginPasswordInput;
@@ -42,6 +31,7 @@ public class AuthSystem : MonoBehaviour
 
     private DatabaseReference _db;
 
+    #endregion
     private void Awake()
     {
         _db = FirebaseDatabase.DefaultInstance.RootReference;
@@ -49,6 +39,7 @@ public class AuthSystem : MonoBehaviour
         _rememberMeToggle.isOn = PlayerPrefs.GetInt(REMEMBER_ME_KEY, 0) == 1;
     }
 
+    #region AutoLogin
     private void CheckAutoLogin()
     {
         if (ShouldAutoLogin())
@@ -139,7 +130,9 @@ public class AuthSystem : MonoBehaviour
 
         LoadMainMenu();
     }
+    #endregion
 
+    #region RegisterSystem
     public void Register()
     {
         FirebaseAuth auth = FirebaseAuth.DefaultInstance;
@@ -195,7 +188,8 @@ public class AuthSystem : MonoBehaviour
             }
             else
             {
-                Debug.Log("Email verification required");
+                _registerErrorLog.gameObject.SetActive(true);
+                _registerErrorLog.text = "Please, verify your email and login with same credentials.\nVerification email sent on your email.";
                 SendEmailVerification();
                 SaveRememberMeState(true);
             }
@@ -249,7 +243,10 @@ public class AuthSystem : MonoBehaviour
             }
             else
             {
+                _loginErrorLog?.gameObject.SetActive(true);
                 Debug.LogWarning("Please verify email");
+                _loginErrorLog.text = "Please, verify your email and login with same credentials.\nVerification email sent on your email.";
+                SendEmailVerification();
                 SaveRememberMeState(_rememberMeToggle.isOn);
             }
         });
@@ -308,12 +305,12 @@ public class AuthSystem : MonoBehaviour
     {
         SceneManager.LoadScene("Menu");
     }
+    #endregion
 
-
-
+    #region ErrorHandling
     private void HandleFirebaseAuthError(FirebaseException firebaseEx, TMP_Text errorLog)
     {
-        
+
         AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
         switch (errorCode)
@@ -354,10 +351,17 @@ public class AuthSystem : MonoBehaviour
             case AuthError.NetworkRequestFailed:
                 errorLog.text = "Network request failed";
                 break;
+            case AuthError.UnverifiedEmail:
+                errorLog.text = "Please, verify your email and try again.\nVerification email sent on your email.";
+                SendEmailVerification();
+                break;
             default:
                 errorLog.text = $"Unknown error: {errorCode}";
                 break;
         }
     }
+    #endregion
+
+
 
 }
