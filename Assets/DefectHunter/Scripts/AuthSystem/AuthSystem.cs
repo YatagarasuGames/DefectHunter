@@ -46,10 +46,6 @@ public class AuthSystem : MonoBehaviour
     {
         _db = FirebaseDatabase.DefaultInstance.RootReference;
         CheckAutoLogin();
-    }
-
-    private void Start()
-    {
         _rememberMeToggle.isOn = PlayerPrefs.GetInt(REMEMBER_ME_KEY, 0) == 1;
     }
 
@@ -151,8 +147,16 @@ public class AuthSystem : MonoBehaviour
         string password = _registerPasswordInput.text;
         string confirmedPassword = _registerConfirmPasswordInput.text;
 
+        if (_usernameInput.text.Length < 3)
+        {
+            _registerErrorLog.gameObject.SetActive(true);
+            _registerErrorLog.text = "Length of username must be 3 or more characters";
+            return;
+        }
+
         auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
         {
+            _registerErrorLog.gameObject.SetActive(false);
             if (task.IsCanceled)
             {
                 Debug.LogError("Register Canceled");
