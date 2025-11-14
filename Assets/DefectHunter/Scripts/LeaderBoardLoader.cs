@@ -1,20 +1,30 @@
-using Firebase.Database;
+using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Networking;
+
+public class UserLeaderboardEntryResponse
+{
+    public Guid UserId { get; }
+    public string Username { get; }
+    public uint Score { get; }
+
+    public UserLeaderboardEntryResponse(Guid userId, string username, uint score)
+    {
+        UserId = userId;
+        Username = username;
+        Score = score;
+    }
+}
 
 public class LeaderBoardLoader : MonoBehaviour
 {
-    private DatabaseReference _db;
 
     [SerializeField] private GameObject _dbUserTemplate;
     [SerializeField] private Transform _content;
 
-    private void Awake()
-    {
-        _db = FirebaseDatabase.DefaultInstance.RootReference;
-    }
+    private readonly string BASE_URL = "https://localhost:7000/leaderboard";
 
     private void OnEnable()
     {
@@ -25,29 +35,28 @@ public class LeaderBoardLoader : MonoBehaviour
 
     private IEnumerator InitLeaderboard()
     {
-        List<UserData> userData = new List<UserData>();
-
-        var task = _db.Child("users").GetValueAsync();
-        yield return new WaitUntil(predicate: () => task.IsCompleted);
-        DataSnapshot snapshot = task.Result;
-        
-        if (snapshot.Exists)
+        using (UnityWebRequest request = new UnityWebRequest($"{BASE_URL}/get-all-users", "GET"))
         {
-            foreach (DataSnapshot userSnapshot in snapshot.Children)
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.disposeDownloadHandlerOnDispose = true;
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
             {
-                string userJson = userSnapshot.GetRawJsonValue();
-                UserData user = JsonUtility.FromJson<UserData>(userJson);
-                userData.Add(user);
-            }
-        }
-        
-        userData = userData.OrderByDescending(user => user.Points).ToList();
+                print(request.downloadHandler.text);
+                var leaderboard = JsonConvert.DeserializeObject<UserLeaderboardEntryResponse[]>(request.downloadHandler.text);
 
-        for (int i = 0; i < userData.Count; i++)
-        {
-            UserData currentUser = userData[i];
-            GameObject currentUserRecord = Instantiate(_dbUserTemplate, _content);
-            currentUserRecord.GetComponent<UserLeaderBoardTemplate>().Init(i + 1, currentUser.Username, currentUser.Points);
+                for(int i = 0; i < leaderboard.Length; i++)
+                {
+                    GameObject entryGameobject = Instantiate(_dbUserTemplate, _content);
+                    entryGameobject.GetComponent<UserLeaderBoardTemplate>().Init(i+1, leaderboard[i].Username, leaderboard[i].Score);
+                }
+            }
+
+            else
+            {
+                print("error");
+            }
         }
     }
 
