@@ -1,6 +1,7 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
-using Newtonsoft.Json;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -28,36 +29,76 @@ public class LeaderBoardLoader : MonoBehaviour
 
     private void OnEnable()
     {
-        StartCoroutine(InitLeaderboard());
+        InitLeaderboard();
     }
 
 
 
-    private IEnumerator InitLeaderboard()
+    private void InitLeaderboard()
     {
-        using (UnityWebRequest request = new UnityWebRequest($"{BASE_URL}/get-all-users", "GET"))
-        {
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.disposeDownloadHandlerOnDispose = true;
-            yield return request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.Success)
+        StartCoroutine(ApiService.Instance.GetLeaderboard(
+            scores =>
             {
-                print(request.downloadHandler.text);
-                var leaderboard = JsonConvert.DeserializeObject<UserLeaderboardEntryResponse[]>(request.downloadHandler.text);
+                Debug.Log($"Got leaderboard with {scores.Length} entries");
 
-                for(int i = 0; i < leaderboard.Length; i++)
+                for (int i = 0; i < scores.Length; i++)
                 {
                     GameObject entryGameobject = Instantiate(_dbUserTemplate, _content);
-                    entryGameobject.GetComponent<UserLeaderBoardTemplate>().Init(i+1, leaderboard[i].Username, leaderboard[i].Score);
+                    entryGameobject.GetComponent<UserLeaderBoardTemplate>().Init(i + 1, scores[i].Username, scores[i].Score);
                 }
-            }
-
-            else
+            },
+            error =>
             {
-                print("error");
+                Debug.LogError($"Failed to get leaderboard: {error}");
             }
-        }
+            ));
+
+        //using (UnityWebRequest request = new UnityWebRequest($"{BASE_URL}/get-all-users", "GET"))
+        //{
+
+
+
+        //    request.downloadHandler = new DownloadHandlerBuffer();
+        //    request.disposeDownloadHandlerOnDispose = true;
+        //    yield return ApiService.Instance.ExecuteAuthorizedRequest(
+        //        request,
+        //        onSuccess =>
+        //        {
+        //            print(request.downloadHandler.text);
+        //        var leaderboard = JsonConvert.DeserializeObject<UserLeaderboardEntryResponse[]>(request.downloadHandler.text);
+
+        //        for(int i = 0; i < leaderboard.Length; i++)
+        //        {
+        //            GameObject entryGameobject = Instantiate(_dbUserTemplate, _content);
+        //            entryGameobject.GetComponent<UserLeaderBoardTemplate>().Init(i+1, leaderboard[i].Username, leaderboard[i].Score);
+        //        }
+        //        },
+
+        //        onError =>
+        //        {
+        //            print("error");
+        //        }
+        //        );
+        //}
+            
+
+        //using (UnityWebRequest request = new UnityWebRequest($"{BASE_URL}/get-all-users", "GET"))
+        //{
+        //    request.downloadHandler = new DownloadHandlerBuffer();
+        //    request.disposeDownloadHandlerOnDispose = true;
+        //    yield return request.SendWebRequest();
+
+        //    if (request.result == UnityWebRequest.Result.Success)
+        //    {
+                
+        //    }
+
+        //    else
+        //    {
+                
+        //    }
+        //}
     }
 
     private void CleanChildren()

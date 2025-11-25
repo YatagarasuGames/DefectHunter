@@ -4,8 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using static ApiService;
 
 [Serializable]
 public class ErrorResponse
@@ -13,132 +17,243 @@ public class ErrorResponse
     public string message;
 }
 
+[Serializable]
+public class RegisterResponse
+{
+    public string accessToken;
+    public string refreshToken;
+    public int expiresIn;
+}
+
 public class AuthManager : MonoBehaviour
 {
-    private const string BASE_URL = "https://localhost:7000/auth";
+    [Header("UI References")]
+    public GameObject loginPanel;
+    public GameObject registerPanel;
+    public GameObject loadingPanel;
 
+    public TMP_InputField loginEmailInput;
+    public TMP_InputField loginPasswordInput;
+    public TMP_InputField registerUsernameInput;
+    public TMP_InputField registerEmailInput;
+    public TMP_InputField registerPasswordInput;
+
+    public Button loginButton;
+    public Button registerButton;
+    public Button switchToRegisterButton;
+    public Button switchToLoginButton;
+
+    public TextMeshProUGUI loginStatusText;
+    public TextMeshProUGUI registerStatusText;
+    public TextMeshProUGUI loadingText;
 
     private void Start()
     {
-        StartCoroutine(CheckServerAvailability());
+        InitializeUI();
+        AttemptAutoLogin();
     }
-    private IEnumerator CheckServerAvailability()
+
+    private void InitializeUI()
     {
-        using (UnityWebRequest request = new UnityWebRequest($"{BASE_URL}/test", "GET"))
+        loginButton.onClick.AddListener(OnLoginClicked);
+        registerButton.onClick.AddListener(OnRegisterClicked);
+        switchToRegisterButton.onClick.AddListener(ShowRegisterPanel);
+        switchToLoginButton.onClick.AddListener(ShowLoginPanel);
+
+        loginPanel.SetActive(false);
+        registerPanel.SetActive(false);
+        loadingPanel.SetActive(false);
+    }
+
+    private void AttemptAutoLogin()
+    {
+        ShowLoadingPanel("Checking authentication...");
+
+        if (ApiService.Instance == null)
         {
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.timeout = 5;
-
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                Debug.Log("Server is available");
-            }
-            else
-            {
-                Debug.LogError($"Server unavailable: {request.error}");
-                Debug.LogError($"URL: {BASE_URL}");
-            }
+            Debug.LogError("ApiService instance is null!");
+            HideLoadingPanel();
+            ShowLoginPanel();
+            return;
         }
-    }
 
-    public void Register(string username, string email, string password, Action<bool, string> callback)
-    {
-        StartCoroutine(RegisterCoroutine(username, email, password, callback));
-    }
-
-    public void Login(string email, string password, Action<bool, string> callback)
-    {
-        StartCoroutine(LoginCoroutine(email, password, callback));
-    }
-
-    private IEnumerator RegisterCoroutine(string username, string email, string password, Action<bool, string> callback)
-    {
-        string fullUrl = $"{BASE_URL}/register";
-        Debug.Log($"Starting REGISTER request to: {fullUrl}");
-        Debug.Log($"Request data: {username}, {email}, {password}");
-
-        var requestData = new UserRequest
+        if (!ApiService.Instance.HasTokens)
         {
-            Username = username,
-            Email = email,
-            Password = password
-        };
-
-        string jsonData = JsonUtility.ToJson(requestData);
-        Debug.Log($"JSON data: {jsonData}");
-
-        using (UnityWebRequest request = new UnityWebRequest(fullUrl, "POST"))
-        {
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.timeout = 10;
-
-            request.SetRequestHeader("Accept", "application/json");
-
-            yield return request.SendWebRequest();
-
-            Debug.Log($"Request completed: {request.result}");
-            Debug.Log($"Response code: {request.responseCode}");
-            Debug.Log($"Response: {request.downloadHandler?.text}");
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                Debug.Log($"REGISTER successful");
-                callback?.Invoke(true, "Registration successful!");
-            }
-            else
-            {
-                Debug.LogError($"REGISTER failed");
-            }
+            Debug.Log("No saved tokens found");
+            HideLoadingPanel();
+            ShowLoginPanel();
+            return;
         }
+
+        StartCoroutine(ApiService.Instance.AutoLogin(
+            OnAutoLoginSuccess,
+            OnAutoLoginError
+        ));
     }
 
-
-    private string GetErrorMessage(UnityWebRequest request)
+    private void OnAutoLoginSuccess(LoginResponse response)
     {
-        try
-        {
-            var errorResponse = JsonUtility.FromJson<ErrorResponse>(request.downloadHandler.text);
-            return errorResponse.message ?? request.error;
-        }
-        catch
-        {
-            return request.error ?? "Unknown error occurred";
-        }
+        HideLoadingPanel();
+        ShowGamePanel();
+        Debug.Log($"Auto-login successful for user: {response.User.Username}");
     }
 
-    private IEnumerator LoginCoroutine(string email, string password, Action<bool, string> callback)
+    private void OnAutoLoginError(string error)
     {
-        var requestData = new UserRequest
+        HideLoadingPanel();
+        ShowLoginPanel();
+        loginStatusText.text = $"Auto-login failed: {error}";
+        Debug.Log($"Auto-login failed: {error}");
+    }
+
+    private void OnLoginClicked()
+    {
+        string email = loginEmailInput.text;
+        string password = loginPasswordInput.text;
+
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
-            Email = email,
-            Password = password
-        };
-
-        string jsonData = JsonUtility.ToJson(requestData);
-
-        using (UnityWebRequest request = new UnityWebRequest($"{BASE_URL}/login", "POST"))
-        {
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonData));
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.disposeDownloadHandlerOnDispose = true;
-
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                print("Success login");
-            }
-            else
-            {
-                var errorMessage = GetErrorMessage(request);
-                print(errorMessage);
-            }
+            loginStatusText.text = "Please fill all fields";
+            return;
         }
+
+        loginStatusText.text = "Logging in...";
+        loginButton.interactable = false;
+        ShowLoadingPanel("Logging in...");
+
+        StartCoroutine(LoginCoroutine(email, password, OnLoginSuccess, OnLoginError));
+    }
+
+    private IEnumerator LoginCoroutine(string email, string password, Action<LoginResponse> onSuccess, Action<string> onError)
+    {
+        yield return ApiService.Instance.Login(email, password, onSuccess, onError);
+    }
+
+    private void OnLoginSuccess(LoginResponse response)
+    {
+        HideLoadingPanel();
+        loginStatusText.text = "Login successful!";
+        ShowGamePanel();
+        loginButton.interactable = true;
+    }
+
+    private void OnLoginError(string error)
+    {
+        HideLoadingPanel();
+        loginStatusText.text = $"Login failed: {error}";
+        loginButton.interactable = true;
+    }
+
+    private void OnRegisterClicked()
+    {
+        string username = registerUsernameInput.text;
+        string email = registerEmailInput.text;
+        string password = registerPasswordInput.text;
+
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        {
+            registerStatusText.text = "Please fill all fields";
+            return;
+        }
+
+        if (password.Length < 6)
+        {
+            registerStatusText.text = "Password must be at least 6 characters";
+            return;
+        }
+
+        registerStatusText.text = "Registering...";
+        registerButton.interactable = false;
+        ShowLoadingPanel("Creating account...");
+
+        StartCoroutine(RegisterCoroutine(username, email, password, OnRegisterSuccess, OnRegisterError));
+    }
+
+    private IEnumerator RegisterCoroutine(string username, string email, string password, Action<RegisterResponseData> onSuccess, Action<string> onError)
+    {
+        yield return ApiService.Instance.Register(username, email, password, onSuccess, onError);
+    }
+
+    private void OnRegisterSuccess(RegisterResponseData response)
+    {
+        HideLoadingPanel();
+        registerStatusText.text = "Registration successful!";
+
+        if (!string.IsNullOrEmpty(response.accessToken) && !string.IsNullOrEmpty(response.refreshToken))
+        {
+            ApiService.Instance.SaveTokens(new ApiService.TokenData
+            {
+                accessToken = response.accessToken,
+                refreshToken = response.refreshToken
+            });
+
+            var userData = ApiService.Instance.DecodeJwtToken(response.accessToken);
+            ShowGamePanel();
+        }
+        else
+        {
+            ShowLoginPanel();
+            loginEmailInput.text = registerEmailInput.text;
+            loginStatusText.text = "Registration successful! Please login.";
+        }
+
+        registerButton.interactable = true;
+    }
+
+    private void OnRegisterError(string error)
+    {
+        HideLoadingPanel();
+        registerStatusText.text = $"Registration failed: {error}";
+        registerButton.interactable = true;
+    }
+
+    private void ShowLoadingPanel(string message = "Loading...")
+    {
+        loadingPanel.SetActive(true);
+        loadingText.text = message;
+    }
+
+    private void HideLoadingPanel()
+    {
+        loadingPanel.SetActive(false);
+    }
+
+    public void ShowLoginPanel()
+    {
+        loginPanel.SetActive(true);
+        registerPanel.SetActive(false);
+
+        loginStatusText.text = "";
+        loginEmailInput.text = "";
+        loginPasswordInput.text = "";
+        loadingText.text = "";
+
+        loginButton.interactable = true;
+        registerButton.interactable = true;
+    }
+
+    public void ShowRegisterPanel()
+    {
+        loginPanel.SetActive(false);
+        registerPanel.SetActive(true);
+
+        registerStatusText.text = "";
+        registerUsernameInput.text = "";
+        registerEmailInput.text = "";
+        registerPasswordInput.text = "";
+        loadingText.text = "";
+
+        loginButton.interactable = true;
+        registerButton.interactable = true;
+    }
+
+    private void ShowGamePanel()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
+    public void ShowMessage(string message)
+    {
+        loginStatusText.text = message;
     }
 }

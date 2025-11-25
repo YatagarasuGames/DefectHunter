@@ -48,7 +48,7 @@ public class AuthUI : MonoBehaviour
             return;
         }
 
-        manager.Login(email, password, OnAuthComplete);
+        //manager.Login(email, password, OnAuthComplete);
         ShowMessage("Logging in...", true);
     }
 
@@ -70,7 +70,7 @@ public class AuthUI : MonoBehaviour
             return;
         }
 
-        manager.Register(username, email, password, OnAuthComplete);
+        //manager.Register(username, email, password, OnAuthComplete);
         ShowMessage("Registering...", true);
     }
 
